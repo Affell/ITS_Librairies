@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="[ITS] Response System:jar">
+    <output-path>$PROJECT_DIR$</output-path>
+    <root id="archive" name="[ITS] Response System.jar">
+      <element id="module-output" name="[ITS] Response System" />
+    </root>
+  </artifact>
+</component>
