@@ -1,9 +1,0 @@
-{
-  "name": "[ITS]_Client_JS",
-  "version": "0.0.1",
-  "description": "Javascript compatibility of [ITS] Client in Java",
-  "dependencies": {
-    "express": "^4.17.1",
-    "socket.io-client": "^4.2.0"
-  }
-}
