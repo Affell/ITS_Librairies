@@ -179,14 +179,14 @@ public class SocketWorker extends Thread implements IResponseWorker {
             boolean version = Boolean.parseBoolean(data.substring(8));
             if (!version) return false;
             else {
-                sendData("macAdress:" + Client.getMacAddress(), false);
+                sendData("macAddress:" + Client.getMacAddress(), false);
             }
         }else if (data.startsWith("publicKey:")) {
             String array = data.replace("publicKey:", "");
             try {
-                PublicKey publicClientKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(array)));
+                keysGenerator.setPublicKey(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(array))));
                 keysGenerator.generateKeys(true, false);
-                sendData("secretKey:" + EncryptedRequestManager.encryptSecretKey(keysGenerator.getSecretKey(), publicClientKey), false);
+                sendData("secretKey:" + EncryptedRequestManager.encryptSecretKey(keysGenerator), false);
             } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 return false;

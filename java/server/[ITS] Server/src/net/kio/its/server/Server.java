@@ -7,6 +7,7 @@ import net.kio.its.logger.LogType;
 import net.kio.its.logger.Logger;
 import net.kio.its.server.events.ClientSocketOpenedEvent;
 import net.kio.its.server.events.ServerWorkerBoundEvent;
+import net.kio.security.dataencryption.KeysGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class Server implements ILogger {
     private final List<ServerWorker> clients;
     private final EventsManager eventsManager;
 
+    private final KeysGenerator keysGenerator;
+
     private final boolean debug;
 
     public Server(String name, int port, boolean debug) throws IOException {
@@ -43,9 +46,11 @@ public class Server implements ILogger {
         this.socketThreadListener = new SocketThreadListener(this);
         this.clients = new ArrayList<>();
         this.eventsManager = new EventsManager();
+        this.keysGenerator = new KeysGenerator();
 
         // CRYPTOGRAPHIC PROVIDER
         Security.addProvider(new BouncyCastleProvider());
+        keysGenerator.generateKeys(false, true);
 
         // Error Thread
         System.setErr(new PrintStream(new OutputStream() {
@@ -88,7 +93,7 @@ public class Server implements ILogger {
         ClientSocketOpenedEvent event = new ClientSocketOpenedEvent(socket);
         eventsManager.callEvent(event);
         if(!event.isCancelled()){
-            ServerWorker serverWorker = new ServerWorker(this, socket);
+            ServerWorker serverWorker = new ServerWorker(this, socket, keysGenerator);
             ServerWorkerBoundEvent serverWorkerBoundEvent = new ServerWorkerBoundEvent(serverWorker);
             eventsManager.callEvent(serverWorkerBoundEvent);
             if(!serverWorkerBoundEvent.isCancelled()){

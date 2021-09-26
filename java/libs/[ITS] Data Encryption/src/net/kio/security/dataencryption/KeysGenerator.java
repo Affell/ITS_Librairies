@@ -16,35 +16,35 @@ import javax.crypto.SecretKey;
 
 public class KeysGenerator {
     private final int keySize;
-    private final String algorithm;
+    private final String asyncAlgorithm;
     private KeyPairGenerator keyPairGenerator;
     private KeyGenerator keyGenerator;
     private SecretKey secretKey;
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
-    public KeysGenerator(int keySize, String algorithm) {
+    public KeysGenerator(int keySize, String asyncAlgorithm) {
         this.secretKey = null;
         this.publicKey = null;
         this.privateKey = null;
         this.keySize = keySize;
-        this.algorithm = algorithm;
+        this.asyncAlgorithm = asyncAlgorithm;
         this.initializeGenerators();
     }
 
     public KeysGenerator() {
-        this(2048, "RSA");
+        this(2048);
     }
 
     public KeysGenerator(int keySize) {
-        this(keySize, "RSA");
+        this(keySize, "RSA/None/OAEPWithSHA-256AndMGF1Padding");
     }
 
     private void initializeGenerators() {
         try {
             this.keyGenerator = KeyGenerator.getInstance("AES");
             this.keyGenerator.init(128);
-            this.keyPairGenerator = KeyPairGenerator.getInstance(this.algorithm);
+            this.keyPairGenerator = KeyPairGenerator.getInstance(this.asyncAlgorithm.split("/")[0]);
             this.keyPairGenerator.initialize(this.keySize);
         } catch (NoSuchAlgorithmException var2) {
             var2.printStackTrace();
@@ -73,11 +73,27 @@ public class KeysGenerator {
         return this.publicKey;
     }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
     public String getStringPublicKey() {
         return Base64.getEncoder().encodeToString(this.getPublicKey().getEncoded());
     }
 
     public SecretKey getSecretKey() {
         return this.secretKey;
+    }
+
+    public void setSecretKey(SecretKey secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public String getAsyncAlgorithm() {
+        return asyncAlgorithm;
+    }
+
+    public KeysGenerator clone() throws CloneNotSupportedException {
+        return (KeysGenerator) super.clone();
     }
 }

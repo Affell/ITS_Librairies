@@ -20,6 +20,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public class EncryptedRequestManager {
+
     public EncryptedRequestManager() {
     }
 
@@ -39,35 +40,35 @@ public class EncryptedRequestManager {
         return Base64.encode(byteCipherText);
     }
 
-    public static SecretKey decryptSecretKey(String data, PrivateKey privateKey) {
+    public static SecretKey decryptSecretKey(String data, KeysGenerator keysGenerator) {
         try {
-            return decryptSecretKey0(Base64.decode(data), privateKey);
+            return decryptSecretKey0(Base64.decode(data), keysGenerator);
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException var3) {
             var3.printStackTrace();
             return null;
         }
     }
 
-    private static SecretKey decryptSecretKey0(byte[] data, PrivateKey privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance(privateKey.getAlgorithm());
-        cipher.init(2, privateKey);
+    private static SecretKey decryptSecretKey0(byte[] data, KeysGenerator keysGenerator) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance(keysGenerator.getAsyncAlgorithm());
+        cipher.init(2, keysGenerator.getPrivateKey());
         byte[] decryptedKey = cipher.doFinal(data);
         return new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
     }
 
-    public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey) {
+    public static String encryptSecretKey(KeysGenerator keysGenerator) {
         try {
-            return Base64.encode(encryptSecretKey0(secretKey, publicKey));
+            return Base64.encode(encryptSecretKey0(keysGenerator));
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException var3) {
             var3.printStackTrace();
             return null;
         }
     }
 
-    private static byte[] encryptSecretKey0(SecretKey secretKey, PublicKey publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance(publicKey.getAlgorithm() + "/None/OAEPWithSHA-256AndMGF1Padding");
-        cipher.init(1, publicKey);
-        return cipher.doFinal(secretKey.getEncoded());
+    private static byte[] encryptSecretKey0(KeysGenerator keysGenerator) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance(keysGenerator.getAsyncAlgorithm());
+        cipher.init(1, keysGenerator.getPublicKey());
+        return cipher.doFinal(keysGenerator.getSecretKey().getEncoded());
     }
 
     public static String decrypt(String data, SecretKey secretKey) {
@@ -79,7 +80,7 @@ public class EncryptedRequestManager {
     }
 
     private static String decrypt0(byte[] data, SecretKey secretKey) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, NullPointerException, IllegalArgumentException {
-        Cipher aesCipher = Cipher.getInstance(secretKey.getAlgorithm() + "/None/OAEPWithSHA-256AndMGF1Padding");
+        Cipher aesCipher = Cipher.getInstance(secretKey.getAlgorithm());
         aesCipher.init(2, secretKey);
         byte[] bytePlainText = aesCipher.doFinal(data);
         return new String(bytePlainText, StandardCharsets.UTF_8);

@@ -5,6 +5,7 @@ import net.kio.its.logger.ConsoleColors;
 import net.kio.its.logger.ILogger;
 import net.kio.its.logger.LogType;
 import net.kio.its.logger.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,6 +13,7 @@ import java.io.PrintStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +36,9 @@ public class Client implements ILogger {
         setMacAddress();
         eventsManager = new EventsManager();
         socketWorkerList = new ArrayList<>();
+
+        // CRYPTOGRAPHIC PROVIDER
+        Security.addProvider(new BouncyCastleProvider());
 
         // Error Thread
         System.setErr(new PrintStream(new OutputStream() {

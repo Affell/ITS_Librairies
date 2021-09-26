@@ -10,7 +10,6 @@ import net.kio.its.server.events.*;
 import net.kio.security.dataencryption.EncryptedRequestManager;
 import net.kio.security.dataencryption.KeysGenerator;
 
-import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -33,16 +32,21 @@ public class ServerWorker extends Thread implements IResponseWorker {
     private final ResponseManager responseManager;
     private final String requestSeparator;
     private String macAddress;
-    private SecretKey clientSecretKey;
     private final String commandPrefix;
 
-    public ServerWorker(Server server, Socket socket) throws IOException {
+    public ServerWorker(Server server, Socket socket, KeysGenerator keysGenerator) throws IOException {
+        KeysGenerator keysGenerator1;
         this.server = server;
         this.socket = socket;
         socket.setSoTimeout(0);
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
         this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.keysGenerator = new KeysGenerator();
+        try {
+            keysGenerator1 = keysGenerator.clone();
+        } catch (CloneNotSupportedException e) {
+            keysGenerator1 = new KeysGenerator();
+        }
+        this.keysGenerator = keysGenerator1;
         this.responseManager = new ResponseManager();
         this.requestSeparator = Server.generateRequestSeparator();
         this.commandPrefix = "!";
@@ -75,7 +79,6 @@ public class ServerWorker extends Thread implements IResponseWorker {
             startConnectionProtocol();
             String line;
             while (!Thread.interrupted() && (line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
                 onLineRead(line);
             }
             disconnectSocket();
@@ -90,7 +93,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
 
     private void onLineRead(String line) {
         String decryptedData;
-        if (clientSecretKey != null && (decryptedData = EncryptedRequestManager.decrypt(line, clientSecretKey)) != null) {
+        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator.getSecretKey())) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
             onDataReceived(new String[]{line}, false);
@@ -162,11 +165,11 @@ public class ServerWorker extends Thread implements IResponseWorker {
             sendData("separator:" + requestSeparator, false);
         } else if (data.startsWith("macAddress:")) {
             macAddress = data.replace("macAddress:", "");
-            keysGenerator.generateKeys(false, true);
+            if(keysGenerator.getPublicKey() == null) keysGenerator.generateKeys(false, true);
             sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
         } else if (data.startsWith("secretKey:")) {
-            clientSecretKey = EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator.getPrivateKey());
-            boolean connected = clientSecretKey != null;
+            keysGenerator.setSecretKey(EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator));
+            boolean connected = keysGenerator.getSecretKey() != null;
             sendData("connected:" + connected, false);
             connectionProtocol = !connected;
             if (connected) {
@@ -204,7 +207,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
         PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
         data = (responseUUID != null ? "response:" : "") + response.getMsgUUID() + data;
         if (encrypt) {
-            data = EncryptedRequestManager.encrypt(data, clientSecretKey);
+            data = EncryptedRequestManager.encrypt(data, keysGenerator.getSecretKey());
         }
         printWriter.println(data);
         server.getLogger().log(LogType.DEBUG, getName() + " - Data sent (encrypted=" + encrypt + ", uuid=" + response.getMsgUUID() + ") : " + rawData);
