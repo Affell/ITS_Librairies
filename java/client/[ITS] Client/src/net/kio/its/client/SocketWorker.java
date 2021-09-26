@@ -13,6 +13,12 @@ import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.UUID;
 
 public class SocketWorker extends Thread implements IResponseWorker {
@@ -28,7 +34,6 @@ public class SocketWorker extends Thread implements IResponseWorker {
     private DataInputStream dataInputStream;
 
     private final KeysGenerator keysGenerator;
-    private SecretKey serverSecretKey;
     private final ResponseManager responseManager;
 
     private String commandPrefix;
@@ -47,7 +52,6 @@ public class SocketWorker extends Thread implements IResponseWorker {
 
     public void startWorker() {
         try {
-            keysGenerator.generateKeys(false, true);
             connectSocket();
             start();
         } catch (IOException exception) {
@@ -110,7 +114,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
     private void onLineRead(String line) {
 
         String decryptedData;
-        if (serverSecretKey != null && (decryptedData = EncryptedRequestManager.decrypt(line, serverSecretKey)) != null) {
+        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator.getSecretKey())) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
             onDataReceived(new String[]{line}, false);
@@ -176,16 +180,25 @@ public class SocketWorker extends Thread implements IResponseWorker {
             if (!version) return false;
             else {
                 sendData("macAdress:" + Client.getMacAddress(), false);
-                sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
             }
+        }else if (data.startsWith("publicKey:")) {
+            String array = data.replace("publicKey:", "");
+            try {
+                PublicKey publicClientKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(array)));
+                keysGenerator.generateKeys(true, false);
+                sendData("secretKey:" + EncryptedRequestManager.encryptSecretKey(keysGenerator.getSecretKey(), publicClientKey), false);
+            } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                return false;
+            }
+
         } else if (data.startsWith("separator:")) {
             requestSeparator = data.replace("separator:", "");
         } else if (data.startsWith("commandPrefix:")) {
             commandPrefix = data.replace("commandPrefix:", "");
-        } else if (data.startsWith("secretKey:")) {
-            serverSecretKey = EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator.getPrivateKey());
-            boolean connected = serverSecretKey != null;
-            sendData("connected:" + connected, false);
+        } else if (data.startsWith("connected:")) {
+            boolean connected = Boolean.parseBoolean(data.replace("connected:", ""));
+            isConnected = connected;
             connectionProtocol = !connected;
             if (connected) {
                 ConnectionProtocolSuccessEvent event = new ConnectionProtocolSuccessEvent(this);
@@ -222,7 +235,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
         PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
         data = (responseUUID != null ? "response:" : "") + response.getMsgUUID() + data;
         if (encrypt) {
-            data = EncryptedRequestManager.encrypt(data, serverSecretKey);
+            data = EncryptedRequestManager.encrypt(data, keysGenerator.getSecretKey());
         }
         printWriter.println(data);
         client.getLogger().log(LogType.DEBUG, getName() + " - Data sent (encrypted=" + encrypt + ", uuid=" + response.getMsgUUID() + ") : " + rawData);

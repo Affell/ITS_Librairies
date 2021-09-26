@@ -10,16 +10,11 @@ import net.kio.its.server.events.*;
 import net.kio.security.dataencryption.EncryptedRequestManager;
 import net.kio.security.dataencryption.KeysGenerator;
 
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,6 +33,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
     private final ResponseManager responseManager;
     private final String requestSeparator;
     private String macAddress;
+    private SecretKey clientSecretKey;
     private final String commandPrefix;
 
     public ServerWorker(Server server, Socket socket) throws IOException {
@@ -94,7 +90,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
 
     private void onLineRead(String line) {
         String decryptedData;
-        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator.getSecretKey())) != null) {
+        if (clientSecretKey != null && (decryptedData = EncryptedRequestManager.decrypt(line, clientSecretKey)) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
             onDataReceived(new String[]{line}, false);
@@ -166,20 +162,12 @@ public class ServerWorker extends Thread implements IResponseWorker {
             sendData("separator:" + requestSeparator, false);
         } else if (data.startsWith("macAddress:")) {
             macAddress = data.replace("macAddress:", "");
-            server.checkReconnnection(this);
-        } else if (data.startsWith("publicKey:")) {
-            String array = data.replace("publicKey:", "");
-            try {
-                PublicKey publicClientKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(array)));
-                keysGenerator.generateKeys(true, false);
-                sendData("secretKey:" + EncryptedRequestManager.encryptSecretKey(keysGenerator.getSecretKey(), publicClientKey), false);
-            } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return false;
-            }
-        } else if (data.startsWith("connected:")) {
-            boolean connected = Boolean.parseBoolean(data.replace("connected:", ""));
-            isConnected = connected;
+            keysGenerator.generateKeys(false, true);
+            sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
+        } else if (data.startsWith("secretKey:")) {
+            clientSecretKey = EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator.getPrivateKey());
+            boolean connected = clientSecretKey != null;
+            sendData("connected:" + connected, false);
             connectionProtocol = !connected;
             if (connected) {
                 ConnectionProtocolSuccessEvent event = new ConnectionProtocolSuccessEvent(this);
@@ -216,7 +204,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
         PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
         data = (responseUUID != null ? "response:" : "") + response.getMsgUUID() + data;
         if (encrypt) {
-            data = EncryptedRequestManager.encrypt(data, keysGenerator.getSecretKey());
+            data = EncryptedRequestManager.encrypt(data, clientSecretKey);
         }
         printWriter.println(data);
         server.getLogger().log(LogType.DEBUG, getName() + " - Data sent (encrypted=" + encrypt + ", uuid=" + response.getMsgUUID() + ") : " + rawData);

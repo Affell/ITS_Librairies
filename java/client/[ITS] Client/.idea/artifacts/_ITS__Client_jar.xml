@@ -3,10 +3,10 @@
     <output-path>$PROJECT_DIR$</output-path>
     <root id="archive" name="[ITS] Client.jar">
       <element id="module-output" name="[ITS] Client" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../[ITS] Data Encryption/[ITS] Data Encryption.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../[ITS] EventSystem/[ITS] EventSystem.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../[ITS] LogSystem/[ITS] LogSystem.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../[ITS] Response System/[ITS] Response System.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../libs/[ITS] Data Encryption/[ITS] Data Encryption.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../libs/[ITS] EventSystem/[ITS] EventSystem.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../libs/[ITS] LogSystem/[ITS] LogSystem.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../libs/[ITS] Response System/[ITS] Response System.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

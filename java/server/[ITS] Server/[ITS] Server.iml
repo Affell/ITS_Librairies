@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../javalibs/bcprov-ext-jdk16-1.46.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../javalibs/bcprov-ext-jdk16-1.46.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../[ITS] Data Encryption/[ITS] Data Encryption.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/[ITS] Data Encryption/[ITS] Data Encryption.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../[ITS] EventSystem/[ITS] EventSystem.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/[ITS] EventSystem/[ITS] EventSystem.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -37,7 +37,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../[ITS] LogSystem/[ITS] LogSystem.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/[ITS] LogSystem/[ITS] LogSystem.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -46,7 +46,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../[ITS] Response System/[ITS] Response System.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/[ITS] Response System/[ITS] Response System.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

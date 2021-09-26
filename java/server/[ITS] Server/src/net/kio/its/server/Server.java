@@ -31,7 +31,6 @@ public class Server implements ILogger {
 
     private final Logger logger;
     private final List<ServerWorker> clients;
-    private final List<ServerWorker> waitingWorkers;
     private final EventsManager eventsManager;
 
     private final boolean debug;
@@ -43,7 +42,6 @@ public class Server implements ILogger {
         this.logger = new Logger(this);
         this.socketThreadListener = new SocketThreadListener(this);
         this.clients = new ArrayList<>();
-        this.waitingWorkers = new ArrayList<>();
         this.eventsManager = new EventsManager();
 
         // CRYPTOGRAPHIC PROVIDER
@@ -102,19 +100,6 @@ public class Server implements ILogger {
         }
     }
 
-    public void checkReconnnection(ServerWorker serverWorker){
-        ServerWorker waiting = null;
-        for (ServerWorker waitingServerWorker : waitingWorkers) {
-            if (serverWorker.getClientMacAddress().equals(waitingServerWorker.getClientMacAddress()) && waitingServerWorker.getClientSocket().getInetAddress().getHostAddress().equals(serverWorker.getClientSocket().getInetAddress().getHostAddress())) {
-                waiting = waitingServerWorker;
-                break;
-            }
-        }
-        if (waiting != null){
-            waitingWorkers.remove(waiting);
-        }
-    }
-
     public static String generateRequestSeparator(){
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
@@ -146,10 +131,6 @@ public class Server implements ILogger {
 
     public List<ServerWorker> getClients() {
         return clients;
-    }
-
-    public List<ServerWorker> getWaitingWorkers() {
-        return waitingWorkers;
     }
 
     public EventsManager getEventsManager() {
