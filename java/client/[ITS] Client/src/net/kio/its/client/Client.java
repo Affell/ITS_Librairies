@@ -1,18 +1,14 @@
 package net.kio.its.client;
 
 import net.kio.its.event.EventsManager;
-import net.kio.its.logger.ConsoleColors;
 import net.kio.its.logger.ILogger;
 import net.kio.its.logger.LogType;
 import net.kio.its.logger.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -39,29 +35,6 @@ public class Client implements ILogger {
 
         // CRYPTOGRAPHIC PROVIDER
         Security.addProvider(new BouncyCastleProvider());
-
-        // Error Thread
-        System.setErr(new PrintStream(new OutputStream() {
-
-            private boolean errorInProgress = false;
-
-            @Override
-            public void write(int b) throws IOException {
-                write(new byte[]{(byte) b}, 0, 1);
-            }
-
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                String string = new String(b, StandardCharsets.UTF_8);
-                if (string.startsWith("Exception") || (string.startsWith("java") && !errorInProgress)) {
-                    errorInProgress = string.startsWith("Exception");
-                    logger.log(LogType.INTERNAL_ERROR, "Exception caught in system error output : ");
-                }
-                System.out.write(ConsoleColors.RED.getBytes(StandardCharsets.UTF_8));
-                System.out.write(b, off, len);
-                System.out.write(ConsoleColors.RESET.getBytes(StandardCharsets.UTF_8));
-            }
-        }));
     }
 
     public Client(String name) {
