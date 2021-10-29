@@ -3,16 +3,10 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/[ITS] Client/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="[ITS] Response System" level="project" />
-    <orderEntry type="library" name="[ITS] LogSystem" level="project" />
-    <orderEntry type="library" name="[ITS] Data Encryption" level="project" />
-    <orderEntry type="library" name="[ITS] Client" level="project" />
-    <orderEntry type="library" name="[ITS] EventSystem" level="project" />
-    <orderEntry type="library" name="[ITS] Server" level="project" />
     <orderEntry type="module" module-name="[ITS] EventSystem" />
     <orderEntry type="module" module-name="[ITS] LogSystem" />
     <orderEntry type="module" module-name="[ITS] Data Encryption" />

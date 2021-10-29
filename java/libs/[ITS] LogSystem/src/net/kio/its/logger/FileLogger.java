@@ -5,7 +5,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class FileLogger {
 
@@ -47,12 +48,22 @@ public class FileLogger {
 
     private void closeLogFile(){
         if(logFile != null && logFile.exists()){
+            File zipFile = new File("./logs/" + logger.getCurrentStringTime(true) + ".zip");
+            if(!zipFile.exists()) {
+                try {
+                    zipFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             try (
-                FileOutputStream zipFile = new FileOutputStream("./logs/" + logger.getCurrentStringTime(true));
-                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(zipFile);
+                    FileOutputStream outputStream = new FileOutputStream("./logs/" + logger.getCurrentStringTime(true) + ".zip");
+                    ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
             )
             {
-                gzipOutputStream.write(Files.readAllBytes(logFile.toPath()));
+                zipOutputStream.putNextEntry(new ZipEntry(zipFile.getName().replace(".zip", ".log")));
+                zipOutputStream.write(Files.readAllBytes(logFile.toPath()));
+                zipOutputStream.closeEntry();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -51,7 +51,7 @@ public class Logger {
         return getCurrentStringTime(false);
     }
     String getCurrentStringTime(boolean zipFormat){
-        return new SimpleDateFormat("yyyy-MM-dd" + (zipFormat ? "_" : " ") + "HH:mm:ss").format(new Date(System.currentTimeMillis()));
+        return new SimpleDateFormat(zipFormat ? "yyyy-MM-dd_HH-mm-ss" : "yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
     }
 
 }
