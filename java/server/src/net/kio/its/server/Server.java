@@ -1,9 +1,7 @@
 package net.kio.its.server;
 
 import net.kio.its.event.EventsManager;
-import net.kio.its.logger.ConsoleColors;
 import net.kio.its.logger.ILogger;
-import net.kio.its.logger.LogType;
 import net.kio.its.logger.Logger;
 import net.kio.its.server.events.ClientSocketOpenedEvent;
 import net.kio.its.server.events.ServerWorkerBoundEvent;
@@ -11,10 +9,7 @@ import net.kio.security.dataencryption.KeysGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,29 +46,6 @@ public class Server implements ILogger {
         // CRYPTOGRAPHIC PROVIDER
         Security.addProvider(new BouncyCastleProvider());
         keysGenerator.generateKeys(false, true);
-
-        // Error Thread
-        System.setErr(new PrintStream(new OutputStream() {
-
-            private boolean errorInProgress;
-
-            @Override
-            public void write(int b) throws IOException {
-                write(new byte[]{(byte) b}, 0, 1);
-            }
-
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                String string = new String(b, StandardCharsets.UTF_8);
-                if(string.startsWith("Exception") || (string.startsWith("java") && !errorInProgress)){
-                    errorInProgress = string.startsWith("Exception");
-                    logger.log(LogType.INTERNAL_ERROR, "Exception caught in system error output : ");
-                }
-                System.out.write(ConsoleColors.RED.getBytes(StandardCharsets.UTF_8));
-                System.out.write(b, off, len);
-                System.out.write(ConsoleColors.RESET.getBytes(StandardCharsets.UTF_8));
-            }
-        }));
     }
 
     public Server(String name, int port) throws IOException {
