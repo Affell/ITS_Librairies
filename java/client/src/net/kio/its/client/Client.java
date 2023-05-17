@@ -15,7 +15,7 @@ import java.util.*;
 
 public class Client implements ILogger {
 
-    private static final String version = "1.1.0";
+    private static final String version = "1.0";
     private final String name;
     private static String macAddress;
     private final boolean debug;

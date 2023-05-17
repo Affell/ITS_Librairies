@@ -1,16 +1,17 @@
 import platform
 import random
+from time import sleep
 
 from getmac import get_mac_address as gma
 
+from libs.log_system import Logger
 from SocketWorker import SocketWorker
-from log_system import Logger
 
 
 class Client:
     def __init__(self, name: str, debug: bool = False):
         self.name = name
-        self.version = "1.1.0"
+        self.version = "1.0.0"
         self.pythonVersion = "python-" + str(platform.python_version())
         self.macAddress = self.getMacAddress()
         self.debug = debug
@@ -19,13 +20,13 @@ class Client:
 
     def getMacAddress(self):
         macAddress = gma()
-        if macAddress == None:
+        if macAddress is None:
             return self.randomMacAddress()
         return macAddress
 
     def randomMacAddress(self):
         macAddr = []
-        for i in range(6):
+        for _ in range(6):
             randStr = "".join(random.sample("0123456789abcdef", 2))
             macAddr.append(randStr)
         return ":".join(macAddr)
@@ -45,13 +46,12 @@ class Client:
 client = Client("Main Client", True)
 socketWorker = client.addSocketWorker("localhost", 40000)
 socketWorker.startWorker()
-
-# connectSocket("localhost", 40000)
-
-# msgsend = jpysocket.jpyencode("version:1.1.0")  # Encript The Msg
-# socket.send(msgsend)  # Send Msg
-# msgrecv = socket.recv(1024)  # Recieve msg
-# msgrecv = jpysocket.jpydecode(msgrecv)  # Decript msg
-# print("From Server: ", msgrecv)
-# socket.close()  # Close connection
-# print("Connection Closed.")
+while (not socketWorker.authenticated):
+    sleep(1)
+inp = None
+while (inp != "exit"):
+    if inp is not None:
+        socketWorker.sendCommand(inp)
+    inp = input()
+socketWorker.stopWorker()
+socketWorker.join()

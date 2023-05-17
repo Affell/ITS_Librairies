@@ -27,6 +27,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
     private final int targetPort;
     private Socket socket;
     private boolean isConnected;
+    private boolean isAuthenticated;
 
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
@@ -112,7 +113,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
     private void onLineRead(String line) {
 
         String decryptedData;
-        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator.getSecretKey())) != null) {
+        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator)) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
             onDataReceived(new String[]{line}, false);
@@ -196,7 +197,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
             commandPrefix = data.replace("commandPrefix:", "");
         } else if (data.startsWith("connected:")) {
             boolean connected = Boolean.parseBoolean(data.replace("connected:", ""));
-            isConnected = connected;
+            isAuthenticated = connected;
             connectionProtocol = !connected;
             if (connected) {
                 ConnectionProtocolSuccessEvent event = new ConnectionProtocolSuccessEvent(this);
@@ -233,7 +234,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
         PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
         data = (responseUUID != null ? "response:" : "") + response.getMsgUUID() + data;
         if (encrypt) {
-            data = EncryptedRequestManager.encrypt(data, keysGenerator.getSecretKey());
+            data = EncryptedRequestManager.encrypt(data, keysGenerator);
         }
         printWriter.println(data);
         client.getLogger().log(LogType.DEBUG, getName() + " - Data sent (encrypted=" + encrypt + ", uuid=" + response.getMsgUUID() + ") : " + rawData);
@@ -246,6 +247,10 @@ public class SocketWorker extends Thread implements IResponseWorker {
 
     public boolean isConnected() {
         return isConnected;
+    }
+
+    public boolean isAuthenticated() {
+        return isAuthenticated;
     }
 
     public String getTargetIp() {

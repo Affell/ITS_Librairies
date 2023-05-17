@@ -92,10 +92,11 @@ public class ServerWorker extends Thread implements IResponseWorker {
     }
 
     private void onLineRead(String line) {
-        String decryptedData;
-        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator.getSecretKey())) != null) {
+        String decryptedData = null;
+        if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator)) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
+            if(keysGenerator.getSecretKey() != null)System.out.println(Arrays.toString(keysGenerator.getSecretKey().getEncoded()));
             onDataReceived(new String[]{line}, false);
         }
     }
@@ -168,7 +169,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
             if(keysGenerator.getPublicKey() == null) keysGenerator.generateKeys(false, true);
             sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
         } else if (data.startsWith("secretKey:")) {
-            keysGenerator.setSecretKey(EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator));
+            EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator);
             boolean connected = keysGenerator.getSecretKey() != null;
             sendData("connected:" + connected, false);
             connectionProtocol = !connected;
@@ -207,7 +208,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
         PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
         data = (responseUUID != null ? "response:" : "") + response.getMsgUUID() + data;
         if (encrypt) {
-            data = EncryptedRequestManager.encrypt(data, keysGenerator.getSecretKey());
+            data = EncryptedRequestManager.encrypt(data, keysGenerator);
         }
         printWriter.println(data);
         server.getLogger().log(LogType.DEBUG, getName() + " - Data sent (encrypted=" + encrypt + ", uuid=" + response.getMsgUUID() + ") : " + rawData);

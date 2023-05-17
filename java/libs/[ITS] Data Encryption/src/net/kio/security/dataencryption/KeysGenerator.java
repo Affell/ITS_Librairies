@@ -11,41 +11,44 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
-import javax.crypto.KeyGenerator;
+import java.util.Random;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class KeysGenerator {
-    private final int keySize;
+    private final int asyncKeySize;
+    private final int syncKeySize;
     private final String asyncAlgorithm;
+    private final String syncAlgorithm;
     private KeyPairGenerator keyPairGenerator;
-    private KeyGenerator keyGenerator;
     private SecretKey secretKey;
+    private byte[] secretKeyIv;
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
-    public KeysGenerator(int keySize, String asyncAlgorithm) {
+    public KeysGenerator(int asyncKeySize, int syncKeySize, String asyncAlgorithm, String syncAlgorithm) {
         this.secretKey = null;
         this.publicKey = null;
         this.privateKey = null;
-        this.keySize = keySize;
+        this.asyncKeySize = asyncKeySize;
+        this.syncKeySize = syncKeySize;
         this.asyncAlgorithm = asyncAlgorithm;
+        this.syncAlgorithm = syncAlgorithm;
         this.initializeGenerators();
     }
 
     public KeysGenerator() {
-        this(2048);
+        this(2048, 16);
     }
 
-    public KeysGenerator(int keySize) {
-        this(keySize, "RSA/None/OAEPWithSHA-256AndMGF1Padding");
+    public KeysGenerator(int asyncKeySize, int syncKeySize) {
+        this(asyncKeySize, syncKeySize, "RSA/None/PKCS1PADDING", "AES/CBC/PKCS5Padding");
     }
 
     private void initializeGenerators() {
         try {
-            this.keyGenerator = KeyGenerator.getInstance("AES");
-            this.keyGenerator.init(128);
             this.keyPairGenerator = KeyPairGenerator.getInstance(this.asyncAlgorithm.split("/")[0]);
-            this.keyPairGenerator.initialize(this.keySize);
+            this.keyPairGenerator.initialize(this.asyncKeySize);
         } catch (NoSuchAlgorithmException var2) {
             var2.printStackTrace();
         }
@@ -54,7 +57,11 @@ public class KeysGenerator {
 
     public void generateKeys(boolean secretKey, boolean asynchronousKeys) {
         if (secretKey) {
-            this.secretKey = this.keyGenerator.generateKey();
+            this.secretKeyIv = new byte[16];
+            new Random().nextBytes(this.secretKeyIv);
+            byte[] secretKeyBytes = new byte[this.syncKeySize];
+            new Random().nextBytes(secretKeyBytes);
+            this.secretKey = new SecretKeySpec(secretKeyBytes, 0, this.syncKeySize, "AES");
         }
 
         if (asynchronousKeys) {
@@ -78,7 +85,8 @@ public class KeysGenerator {
     }
 
     public String getStringPublicKey() {
-        return Base64.getEncoder().encodeToString(this.getPublicKey().getEncoded());
+        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+
     }
 
     public SecretKey getSecretKey() {
@@ -89,8 +97,20 @@ public class KeysGenerator {
         this.secretKey = secretKey;
     }
 
+    public byte[] getSecretKeyIv() {
+        return secretKeyIv;
+    }
+
+    public void setSecretKeyIv(byte[] secretKeyIv) {
+        this.secretKeyIv = secretKeyIv;
+    }
+
     public String getAsyncAlgorithm() {
         return asyncAlgorithm;
+    }
+
+    public String getSyncAlgorithm() {
+        return syncAlgorithm;
     }
 
     public KeysGenerator clone() throws CloneNotSupportedException {

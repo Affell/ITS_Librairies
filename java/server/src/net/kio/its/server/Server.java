@@ -1,27 +1,41 @@
 package net.kio.its.server;
 
+import net.kio.its.event.EventHandler;
 import net.kio.its.event.EventsManager;
+import net.kio.its.event.Listener;
 import net.kio.its.logger.ILogger;
 import net.kio.its.logger.Logger;
 import net.kio.its.server.events.ClientSocketOpenedEvent;
+import net.kio.its.server.events.CommandReceivedEvent;
 import net.kio.its.server.events.ServerWorkerBoundEvent;
+import net.kio.security.dataencryption.EncryptedRequestManager;
 import net.kio.security.dataencryption.KeysGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.security.Security;
+import java.security.*;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.MGF1ParameterSpec;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Server implements ILogger {
 
     private final String name;
 
-    private static final String version = "1.1.0";
+    private static final String version = "1.0";
     private final SocketThreadListener socketThreadListener;
     private final int port;
 
@@ -53,8 +67,10 @@ public class Server implements ILogger {
     }
 
     public static void main(String[] args) throws IOException {
+
         Server server = new Server("Main Test Server", 40000, true);
         server.startSocketListener();
+
     }
 
     public void startSocketListener(){

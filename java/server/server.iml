@@ -7,14 +7,31 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="[ITS] EventSystem" />
-    <orderEntry type="module" module-name="[ITS] LogSystem" />
-    <orderEntry type="module" module-name="[ITS] Data Encryption" />
-    <orderEntry type="module" module-name="[ITS] Response System" />
+    <orderEntry type="library" name="[ITS] Response System" level="project" />
+    <orderEntry type="library" name="[ITS] LogSystem" level="project" />
+    <orderEntry type="library" name="[ITS] Data Encryption" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../javalibs/bcprov-ext-jdk16-1.46.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../javalibs/bcpkix-jdk15on-1.70.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../../javalibs/bcprov-jdk18on-173.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/[ITS] EventSystem/[ITS] EventSystem.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

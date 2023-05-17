@@ -46,7 +46,9 @@ public class EventsManager {
 
     void callEvent0(Event event){
         if(registeredListeners.containsKey(event.getClass())){
-            registeredListeners.get(event.getClass()).forEach(registeredListener -> registeredListener.callEvent(event));
+            registeredListeners.get(event.getClass()).forEach(registeredListener -> {
+                registeredListener.callEvent(event);
+            });
         }
     }
 
