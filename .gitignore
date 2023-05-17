@@ -4,3 +4,4 @@ java/out
 *.iml
 __pycache__/
 *.pyc
+*.jar
