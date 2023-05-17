@@ -2,8 +2,8 @@ package net.kio.its.logger;
 
 public enum LogType {
 
-    INFO(ConsoleColors.GREEN, ConsoleColors.GREEN_BOLD +"[INFO] "),
-    DEBUG(ConsoleColors.YELLOW,  ConsoleColors.YELLOW_BOLD + "[DEBUG] "),
+    INFO(ConsoleColors.GREEN, ConsoleColors.GREEN_BOLD + "[INFO] "),
+    DEBUG(ConsoleColors.YELLOW, ConsoleColors.YELLOW_BOLD + "[DEBUG] "),
     CRITICAL(ConsoleColors.PURPLE, ConsoleColors.PURPLE_BOLD + "[CRITICAL] "),
     INTERNAL_ERROR(ConsoleColors.RED, ConsoleColors.RED_BOLD + "[INTERNAL ERROR] ");
 

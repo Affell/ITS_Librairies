@@ -96,7 +96,8 @@ public class ServerWorker extends Thread implements IResponseWorker {
         if (keysGenerator.getSecretKey() != null && (decryptedData = EncryptedRequestManager.decrypt(line, keysGenerator)) != null) {
             onDataReceived(new String[]{decryptedData, line}, true);
         } else {
-            if(keysGenerator.getSecretKey() != null)System.out.println(Arrays.toString(keysGenerator.getSecretKey().getEncoded()));
+            if (keysGenerator.getSecretKey() != null)
+                System.out.println(Arrays.toString(keysGenerator.getSecretKey().getEncoded()));
             onDataReceived(new String[]{line}, false);
         }
     }
@@ -166,7 +167,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
             sendData("separator:" + requestSeparator, false);
         } else if (data.startsWith("macAddress:")) {
             macAddress = data.replace("macAddress:", "");
-            if(keysGenerator.getPublicKey() == null) keysGenerator.generateKeys(false, true);
+            if (keysGenerator.getPublicKey() == null) keysGenerator.generateKeys(false, true);
             sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
         } else if (data.startsWith("secretKey:")) {
             EncryptedRequestManager.decryptSecretKey(data.replace("secretKey:", ""), keysGenerator);

@@ -1,7 +1,7 @@
 package net.kio.its.client;
 
-import net.kio.its.event.Event;
 import net.kio.its.client.events.*;
+import net.kio.its.event.Event;
 import net.kio.its.logger.LogType;
 import net.kio.its.responsesystem.IResponseWorker;
 import net.kio.its.responsesystem.Response;
@@ -180,7 +180,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
             else {
                 sendData("macAddress:" + Client.getMacAddress(), false);
             }
-        }else if (data.startsWith("publicKey:")) {
+        } else if (data.startsWith("publicKey:")) {
             String array = data.replace("publicKey:", "");
             try {
                 keysGenerator.setPublicKey(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(array))));

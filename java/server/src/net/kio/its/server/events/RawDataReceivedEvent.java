@@ -4,7 +4,7 @@ import net.kio.its.server.ServerWorker;
 
 import java.util.UUID;
 
-public class RawDataReceivedEvent extends DataEvent{
+public class RawDataReceivedEvent extends DataEvent {
     public RawDataReceivedEvent(ServerWorker serverWorker, String data, UUID messageUUID) {
         super(serverWorker, data, messageUUID);
     }

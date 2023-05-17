@@ -2,7 +2,10 @@ package net.kio.its.event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EventsManager {
@@ -15,19 +18,19 @@ public class EventsManager {
         this.threadedEventCaller = new ThreadedEventCaller(this);
     }
 
-    public void registerListener(Listener listener){
-        if(!threadedEventCaller.isAlive()) threadedEventCaller.start();
+    public void registerListener(Listener listener) {
+        if (!threadedEventCaller.isAlive()) threadedEventCaller.start();
         Method[] methods = listener.getClass().getDeclaredMethods();
         for (Method method : methods) {
-            if(method.getAnnotation(EventHandler.class) != null && method.getParameters().length == 1 && Event.class.isAssignableFrom(method.getParameterTypes()[0])){
+            if (method.getAnnotation(EventHandler.class) != null && method.getParameters().length == 1 && Event.class.isAssignableFrom(method.getParameterTypes()[0])) {
                 final Class<? extends Event> eventClass = method.getParameterTypes()[0].asSubclass(Event.class);
                 method.setAccessible(true);
                 LinkedHashSet<RegisteredListener> eventSet = registeredListeners.get(eventClass);
-                if(eventSet == null){
+                if (eventSet == null) {
                     eventSet = new LinkedHashSet<>();
                 }
                 EventExecutor executor = (eventExecutorListener, event) -> {
-                    if(eventClass.isAssignableFrom(event.getClass())){
+                    if (eventClass.isAssignableFrom(event.getClass())) {
                         try {
                             method.invoke(listener, event);
                         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -44,18 +47,18 @@ public class EventsManager {
 
     }
 
-    void callEvent0(Event event){
-        if(registeredListeners.containsKey(event.getClass())){
+    void callEvent0(Event event) {
+        if (registeredListeners.containsKey(event.getClass())) {
             registeredListeners.get(event.getClass()).forEach(registeredListener -> {
                 registeredListener.callEvent(event);
             });
         }
     }
 
-    public void callEvent(Event event){
-        if(!(event instanceof Cancellable)){
+    public void callEvent(Event event) {
+        if (!(event instanceof Cancellable)) {
             threadedEventCaller.callEvent(event);
-        }else{
+        } else {
             callEvent0(event);
         }
     }

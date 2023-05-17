@@ -1,6 +1,5 @@
 package net.kio.its.logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -40,17 +39,21 @@ public class Logger {
         }));
     }
 
-    public void log(String message) {log(LogType.INFO, message);}
-    public void log(LogType logType, String message){
-        if(logType == LogType.DEBUG && !iLogger.isDebug()) return;
+    public void log(String message) {
+        log(LogType.INFO, message);
+    }
+
+    public void log(LogType logType, String message) {
+        if (logType == LogType.DEBUG && !iLogger.isDebug()) return;
         System.out.println(logType.getPrefix() + getCurrentStringTime() + "  |  " + ConsoleColors.YELLOW_BOLD + iLogger.getName() + ConsoleColors.RESET + logType.getColor() + "  |\t" + message + ConsoleColors.RESET);
         fileLogger.writeLog(logType.getPrefix().substring(logType.getPrefix().indexOf('[')) + getCurrentStringTime() + "  |  " + iLogger.getName() + "  |    " + message);
     }
 
-    private String getCurrentStringTime(){
+    private String getCurrentStringTime() {
         return getCurrentStringTime(false);
     }
-    String getCurrentStringTime(boolean zipFormat){
+
+    String getCurrentStringTime(boolean zipFormat) {
         return new SimpleDateFormat(zipFormat ? "yyyy-MM-dd_HH-mm-ss" : "yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
     }
 

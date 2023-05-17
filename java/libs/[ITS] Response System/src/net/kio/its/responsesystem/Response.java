@@ -20,15 +20,15 @@ public class Response {
     public Response waitReply(boolean blockThread, BiConsumer<? super IResponseWorker, ? super String> onReply) throws TimeoutException {
         this.onReply = onReply;
         responseWorker.getResponseManager().waitResponse(this);
-        if(blockThread){
+        if (blockThread) {
             long now = System.currentTimeMillis();
-            while (!replied){
+            while (!replied) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(System.currentTimeMillis() >= now + timeout){
+                if (System.currentTimeMillis() >= now + timeout) {
                     throw new TimeoutException("No response from server in " + timeout + "ms");
                 }
             }
@@ -43,7 +43,7 @@ public class Response {
 
     public void acceptReply(String message) {
         this.replied = true;
-        if(onReply!=null){
+        if (onReply != null) {
             onReply.accept(responseWorker, message);
         }
     }

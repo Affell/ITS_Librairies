@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class SocketThreadListener extends Thread{
+public class SocketThreadListener extends Thread {
 
     private final Server server;
     private final ServerSocket serverSocket;
@@ -19,15 +19,15 @@ public class SocketThreadListener extends Thread{
     @Override
     public void run() {
 
-        try{
+        try {
             server.getLogger().log("SocketThreadListener#run() -> Listening for clients connections");
-            while (!Thread.interrupted()){
+            while (!Thread.interrupted()) {
                 Socket socket = serverSocket.accept();
                 server.getLogger().log(LogType.DEBUG, "New socket accepted from " + socket.getInetAddress().getHostAddress() + " on port " + socket.getPort());
                 server.handleSocketConnection(socket);
             }
             serverSocket.close();
-        }catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
 

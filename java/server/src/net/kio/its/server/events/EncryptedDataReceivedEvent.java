@@ -4,7 +4,7 @@ import net.kio.its.server.ServerWorker;
 
 import java.util.UUID;
 
-public class EncryptedDataReceivedEvent extends DataEvent{
+public class EncryptedDataReceivedEvent extends DataEvent {
 
     private final String decryptedData;
 

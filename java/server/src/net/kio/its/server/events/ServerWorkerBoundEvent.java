@@ -1,8 +1,8 @@
 package net.kio.its.server.events;
 
-import net.kio.its.server.ServerWorker;
 import net.kio.its.event.Cancellable;
 import net.kio.its.event.Event;
+import net.kio.its.server.ServerWorker;
 
 public class ServerWorkerBoundEvent extends Event implements Cancellable {
 

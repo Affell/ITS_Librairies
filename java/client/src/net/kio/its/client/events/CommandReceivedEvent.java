@@ -4,7 +4,7 @@ import net.kio.its.client.SocketWorker;
 
 import java.util.UUID;
 
-public class CommandReceivedEvent extends DataEvent{
+public class CommandReceivedEvent extends DataEvent {
 
     private final String command;
     private final String[] args;

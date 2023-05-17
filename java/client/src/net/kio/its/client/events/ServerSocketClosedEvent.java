@@ -4,7 +4,7 @@ import net.kio.its.client.SocketWorker;
 
 import java.net.Socket;
 
-public class ServerSocketClosedEvent extends SocketEvent{
+public class ServerSocketClosedEvent extends SocketEvent {
 
     private final SocketWorker socketWorker;
 

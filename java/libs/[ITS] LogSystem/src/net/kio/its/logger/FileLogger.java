@@ -34,8 +34,8 @@ public class FileLogger {
         }
     }
 
-    public void writeLog(String line){
-        if(logFile != null && logFile.exists()){
+    public void writeLog(String line) {
+        if (logFile != null && logFile.exists()) {
             try {
                 FileWriter fileWriter = new FileWriter(logFile, true);
                 fileWriter.write(line + "\n");
@@ -46,10 +46,10 @@ public class FileLogger {
         }
     }
 
-    private void closeLogFile(){
-        if(logFile != null && logFile.exists()){
+    private void closeLogFile() {
+        if (logFile != null && logFile.exists()) {
             File zipFile = new File("./logs/" + logger.getCurrentStringTime(true) + ".zip");
-            if(!zipFile.exists()) {
+            if (!zipFile.exists()) {
                 try {
                     zipFile.createNewFile();
                 } catch (IOException e) {
@@ -59,8 +59,7 @@ public class FileLogger {
             try (
                     FileOutputStream outputStream = new FileOutputStream("./logs/" + logger.getCurrentStringTime(true) + ".zip");
                     ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-            )
-            {
+            ) {
                 zipOutputStream.putNextEntry(new ZipEntry(zipFile.getName().replace(".zip", ".log")));
                 zipOutputStream.write(Files.readAllBytes(logFile.toPath()));
                 zipOutputStream.closeEntry();

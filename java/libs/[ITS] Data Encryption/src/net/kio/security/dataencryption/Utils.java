@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package net.kio.security.dataencryption;
 
 import java.math.BigInteger;
@@ -23,7 +18,7 @@ public class Utils {
             BigInteger no = new BigInteger(1, messageDigest);
             hashText = new StringBuilder(no.toString(16));
 
-            while(hashText.length() < 32) {
+            while (hashText.length() < 32) {
                 hashText.insert(0, "0");
             }
         } catch (NoSuchAlgorithmException var5) {

@@ -13,12 +13,12 @@ public class ResponseManager {
         this.responsesWaitingList = new HashMap<>();
     }
 
-    public void waitResponse(Response response){
+    public void waitResponse(Response response) {
         responsesWaitingList.put(response.getMsgUUID(), response);
     }
 
-    public void onResponseReceived(UUID uuid, String message){
-        if(responsesWaitingList.containsKey(uuid)){
+    public void onResponseReceived(UUID uuid, String message) {
+        if (responsesWaitingList.containsKey(uuid)) {
             responsesWaitingList.get(uuid).acceptReply(message);
             responsesWaitingList.remove(uuid);
         }

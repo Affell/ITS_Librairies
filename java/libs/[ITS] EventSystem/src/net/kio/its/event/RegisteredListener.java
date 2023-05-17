@@ -16,8 +16,8 @@ public class RegisteredListener {
         return eventPriority;
     }
 
-    public void callEvent(Event event){
-        if(!(event instanceof Cancellable) || !(((Cancellable) event).isCancelled())){
+    public void callEvent(Event event) {
+        if (!(event instanceof Cancellable) || !(((Cancellable) event).isCancelled())) {
             executor.execute(listener, event);
         }
     }

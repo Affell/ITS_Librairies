@@ -1,35 +1,21 @@
 package net.kio.its.server;
 
-import net.kio.its.event.EventHandler;
 import net.kio.its.event.EventsManager;
-import net.kio.its.event.Listener;
 import net.kio.its.logger.ILogger;
 import net.kio.its.logger.Logger;
 import net.kio.its.server.events.ClientSocketOpenedEvent;
-import net.kio.its.server.events.CommandReceivedEvent;
 import net.kio.its.server.events.ServerWorkerBoundEvent;
-import net.kio.security.dataencryption.EncryptedRequestManager;
 import net.kio.security.dataencryption.KeysGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.MGF1ParameterSpec;
+import java.security.Security;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class Server implements ILogger {
 
@@ -73,27 +59,27 @@ public class Server implements ILogger {
 
     }
 
-    public void startSocketListener(){
-        if(!socketThreadListener.isAlive()) socketThreadListener.start();
+    public void startSocketListener() {
+        if (!socketThreadListener.isAlive()) socketThreadListener.start();
     }
 
     public void handleSocketConnection(Socket socket) throws IOException {
         ClientSocketOpenedEvent event = new ClientSocketOpenedEvent(socket);
         eventsManager.callEvent(event);
-        if(!event.isCancelled()){
+        if (!event.isCancelled()) {
             ServerWorker serverWorker = new ServerWorker(this, socket, keysGenerator);
             ServerWorkerBoundEvent serverWorkerBoundEvent = new ServerWorkerBoundEvent(serverWorker);
             eventsManager.callEvent(serverWorkerBoundEvent);
-            if(!serverWorkerBoundEvent.isCancelled()){
+            if (!serverWorkerBoundEvent.isCancelled()) {
                 clients.add(serverWorker);
                 serverWorker.start();
             }
-        }else{
+        } else {
             socket.close();
         }
     }
 
-    public static String generateRequestSeparator(){
+    public static String generateRequestSeparator() {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 20;
@@ -130,7 +116,7 @@ public class Server implements ILogger {
         return eventsManager;
     }
 
-    public static String getCurrentStringTime(){
+    public static String getCurrentStringTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
     }
 

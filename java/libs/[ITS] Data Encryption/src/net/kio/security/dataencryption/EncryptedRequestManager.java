@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package net.kio.security.dataencryption;
 
 import javax.crypto.BadPaddingException;
@@ -15,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Base64;
 
 public class EncryptedRequestManager {
@@ -32,7 +26,7 @@ public class EncryptedRequestManager {
     private static byte[] encryptSecretKey0(KeysGenerator keysGenerator) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance(keysGenerator.getAsyncAlgorithm());
         cipher.init(1, keysGenerator.getPublicKey());
-        byte[] secretKeyInfo = new byte[keysGenerator.getSecretKeyIv().length+keysGenerator.getSecretKey().getEncoded().length];
+        byte[] secretKeyInfo = new byte[keysGenerator.getSecretKeyIv().length + keysGenerator.getSecretKey().getEncoded().length];
         System.arraycopy(keysGenerator.getSecretKeyIv(), 0, secretKeyInfo, 0, keysGenerator.getSecretKeyIv().length);
         System.arraycopy(keysGenerator.getSecretKey().getEncoded(), 0, secretKeyInfo, keysGenerator.getSecretKeyIv().length, keysGenerator.getSecretKey().getEncoded().length);
         return cipher.doFinal(secretKeyInfo);
