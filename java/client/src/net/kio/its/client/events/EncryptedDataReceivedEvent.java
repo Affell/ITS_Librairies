@@ -6,10 +6,11 @@ import java.util.UUID;
 
 public class EncryptedDataReceivedEvent extends DataEvent {
 
-    private String decryptedData;
+    private final String decryptedData;
 
     public EncryptedDataReceivedEvent(SocketWorker socketWorker, String data, String decryptedData, UUID messageUUID) {
         super(socketWorker, data, messageUUID);
+        this.decryptedData = decryptedData;
     }
 
     public String getDecryptedData() {

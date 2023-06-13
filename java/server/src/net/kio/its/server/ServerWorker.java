@@ -63,6 +63,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
     public void disconnectSocket() throws IOException {
         if (socket == null) throw new SocketException("Socket isn't connected");
         else {
+            stopWorker();
             socket.close();
             isConnected = false;
             interrupt();
@@ -166,7 +167,7 @@ public class ServerWorker extends Thread implements IResponseWorker {
             sendData("commandPrefix:" + commandPrefix, false);
             sendData("separator:" + requestSeparator, false);
         } else if (data.startsWith("macAddress:")) {
-            macAddress = data.replace("macAddress:", "");
+            macAddress = data.replace("macAddress:", "").toUpperCase();
             if (keysGenerator.getPublicKey() == null) keysGenerator.generateKeys(false, true);
             sendData("publicKey:" + keysGenerator.getStringPublicKey(), false);
         } else if (data.startsWith("secretKey:")) {

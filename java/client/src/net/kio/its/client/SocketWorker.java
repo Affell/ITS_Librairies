@@ -79,6 +79,7 @@ public class SocketWorker extends Thread implements IResponseWorker {
     public void disconnectSocket() throws IOException {
         if (socket == null) throw new SocketException("Socket isn't connected");
         else {
+            stopWorker();
             socket.close();
             isConnected = false;
             interrupt();
