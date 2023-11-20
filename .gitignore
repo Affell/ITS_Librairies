@@ -1,4 +1,4 @@
-/java/server/logs/
+/java/logs/
 .idea/
 java/out
 *.iml
